@@ -81,7 +81,7 @@ namespace TelegramBot
         {
             if (name.Length >= 3)
             {
-                string path = path_root; //@"C:\Users\vgbyf\Desktop\C#\Практика\TelegramBot\TelegramBot\bin\Debug\net5.0\Save";
+                string path = path_root; 
 
                 DirectoryInfo dir = new(path_root);
                 bool find = false;
