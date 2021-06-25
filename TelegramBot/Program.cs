@@ -5,14 +5,34 @@ using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Types.InputFiles;
 
+
 namespace TelegramBot
 {
+    
     class Program
     {
+        static string path_root = Environment.CurrentDirectory + "\\Save\\";
         static TelegramBotClient bot;
         static void Main(string[] args)
         {
-            string token = "989083912:AAGuZ7vtJOeBL0UjdX13EnEpBgaGotsAHP0";
+            // Here you need a token
+            string token = "989083912:AAGuZ7vtJOeBL0UjdX13EnEp**********";
+            
+            
+
+            DirectoryInfo save = new(Environment.CurrentDirectory);
+            bool direct = false;
+            foreach (var item in save.GetDirectories())
+            {
+                if(item.Name == "Save")
+                {
+                    direct = true;
+                    break;
+                }
+                
+            }
+
+            if(direct == false) Directory.CreateDirectory(path_root); 
 
             bot = new TelegramBotClient(token);
 
@@ -23,6 +43,7 @@ namespace TelegramBot
 
         private static void MessageListener(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            Console.WriteLine();
             string text = $"{DateTime.Now.ToShortTimeString()} {e.Message.Chat.FirstName} {e.Message.Chat.Id} {e.Message.Type.ToString()} {e.Message.Text} ";
             Console.WriteLine(text);
 
@@ -40,13 +61,15 @@ namespace TelegramBot
                     break;
             }
 
+            
+
         }
 
         static async void DownLoad(string fileId, string path)
         {
             var file = await bot.GetFileAsync(fileId);
 
-            string fileName = $@"C:\Users\vgbyf\Desktop\C#\Практика\TelegramBot\TelegramBot\bin\Debug\net5.0\Save\{path}";
+            string fileName = $"{path_root}{path}";
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
 
             FileStream fs = new FileStream(fileName, FileMode.Create);
@@ -58,9 +81,9 @@ namespace TelegramBot
         {
             if (name.Length >= 3)
             {
-                string path = @"C:\Users\vgbyf\Desktop\C#\Практика\TelegramBot\TelegramBot\bin\Debug\net5.0\Save";
+                string path = path_root; //@"C:\Users\vgbyf\Desktop\C#\Практика\TelegramBot\TelegramBot\bin\Debug\net5.0\Save";
 
-                DirectoryInfo dir = new(path);
+                DirectoryInfo dir = new(path_root);
                 bool find = false;
                 foreach (var item in dir.GetFiles())
                 {
@@ -70,12 +93,11 @@ namespace TelegramBot
                     if (regex.IsMatch(nameFile) == true)
                     {
                         //Console.WriteLine("Файл найден");
-                        path = path + "\\" + item.Name;
+                        path = path + item.Name;
                         using FileStream fs = File.OpenRead(path);
                         InputOnlineFile inputOnlineFile = new InputOnlineFile(fs, item.Name);
                         Thread.Sleep(100);
                         await bot.SendDocumentAsync(chatId, inputOnlineFile);
-                        path = @"C:\Users\vgbyf\Desktop\C#\Практика\TelegramBot\TelegramBot\bin\Debug\net5.0\Save";
                         Console.WriteLine($"{item.Name} Файл загружен в ответ");
                         fs.Close();
                         fs.Dispose();
